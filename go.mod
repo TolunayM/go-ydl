@@ -1,6 +1,8 @@
-module example.com/learning
+module github.com/TolunayM/go-ydl
 
 go 1.21.0
+
+require github.com/kkdai/youtube/v2 v2.9.0
 
 require (
 	github.com/VividCortex/ewma v1.2.0 // indirect
@@ -10,7 +12,6 @@ require (
 	github.com/dop251/goja v0.0.0-20230828202809-3dbe69dd2b8e // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
 	github.com/google/pprof v0.0.0-20230907193218-d3ddc7976beb // indirect
-	github.com/kkdai/youtube/v2 v2.9.0 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/vbauerster/mpb/v5 v5.4.0 // indirect
