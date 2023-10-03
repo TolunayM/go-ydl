@@ -3,12 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"io"
-	"os"
+
 	"os/exec"
 	"runtime"
 	"strings"
 
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/widget"
 	"github.com/kkdai/youtube/v2"
 	"github.com/kkdai/youtube/v2/downloader"
 )
@@ -46,71 +49,75 @@ func getFFMPEG() {
 
 func getVideoId(videoLink string) string {
 	videoID := strings.Split(videoLink, "=")[1]
+
+	if len(videoID) > 11{
+		newID := videoID[:11]
+		return newID
+	}
 	return videoID
 }
 
-func main() {
+func clearTemps(){
+	deleteNec := exec.Command("cmd","/C","del *.m4a *.m4v")
+	deleteNec.Run()
+}
 
-	checkFFMPEG()
-	fmt.Println("Video linki")
-	var videoLink string
-	fmt.Scanln(&videoLink)
+func downloadHQ(videoID string){
+	ctx := context.Background();
+	hqDownload := downloader.Downloader{};
+	client := youtube.Client{};
 
-	videoID := getVideoId(videoLink)
-	client := youtube.Client{}
-	hqDownload := downloader.Downloader{}
-
-	video, err := client.GetVideo(videoID)
-	if err != nil {
-		panic(err)
-	}
-
-	//HQ DOWNLOAD
 	con, err := client.GetVideoContext(context.Background(), videoID)
 	if err != nil {
 		panic(err)
 	}
+	hqDownload.DownloadComposite(ctx,"",con,"hd1080","mp4");
 
-	hqDownload.DownloadComposite(context.Background(), "", con, "hd1080", "mp4")
 
-	//videoInfo,err := client.GetVideoContext(context.Background(),videoID);
-	if err != nil {
-		panic(err)
-	}
 
-	description, err := os.Create(videoID + ".txt")
-	if err != nil {
-		panic(err)
-	}
-	defer description.Close()
-	fmt.Fprintf(description, video.Description)
-	//fmt.Println(videoInfo);
+}
 
-	//0 720p 128kb/s
-	//1 360p
-	//2
-	//3
+func main() {
 
-	formats := video.Formats.WithAudioChannels()
-	stream, _, err := client.GetStream(video, &formats[0])
+	
+	checkFFMPEG()
+	clearTemps()
+	// fmt.Println("Video linki")
+	// var videoLink string
+	// fmt.Scanln(&videoLink)
 
-	if err != nil {
-		panic(err)
-	}
+	myApp := app.New();
+	myWindow := myApp.NewWindow("go-ytdl");
 
-	defer stream.Close()
+	//input
+	input := widget.NewEntry();
+	input.SetPlaceHolder("Paste Youtube Link Here");
 
-	file2, err := os.Create("video.mp4")
+	input.Resize(fyne.NewSize(250,40))
+	input.Move(fyne.NewPos(75,60))
 
-	if err != nil {
-		panic(err)
-	}
+	//download button
+	downButton := widget.NewButton("Download",func() {
+		downloadHQ(getVideoId(input.Text))
+	})
+	downButton.Resize(fyne.NewSize(150,40));
+	downButton.Move(fyne.NewPos(125,120))
+	
 
-	defer file2.Close()
+	//clear temp files
+	clearButton := widget.NewButton("Clear Temp Files",func() {
+		clearTemps();
+	})
+	clearButton.Resize(fyne.NewSize(150,40));
+	clearButton.Move(fyne.NewPos(125,170))
 
-	_, err = io.Copy(file2, stream)
-	if err != nil {
-		panic(err)
-	}
-
+	//content
+	content := container.NewWithoutLayout(input,downButton,clearButton)
+	//run app
+	myWindow.CenterOnScreen();
+	myWindow.Resize(fyne.NewSize(400, 250));
+	myWindow.SetContent(content);
+	myWindow.ShowAndRun();
+	
+	clearTemps();
 }
