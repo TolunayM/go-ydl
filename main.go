@@ -10,30 +10,9 @@ import (
 	"strings"
 
 	"github.com/kkdai/youtube/v2"
-	//  "github.com/u2takey/ffmpeg-go"
 	"github.com/kkdai/youtube/v2/downloader"
 )
 
-/*
-func ffmpeg(videoid string,soundId string){
-	video := ffmpeg_go.Input(videoid);
-	sound := ffmpeg_go.Input(soundId);
-	ffmpeg_go.
-	//KwArgs format = ffmpeg_go.KwArgs{"f":"mp4"}
-
-
-	file,err := os.Create("videoWithSound.mp4");
-	if err != nil {
-		panic(err);
-	}
-
-	defer file.Close();
-
-	_,err = io.Copy(file,output);
-	if err != nil{
-		panic(err)
-	}
-}*/
 
 func checkFFMPEG() {
 	os := runtime.GOOS
@@ -94,12 +73,6 @@ func main() {
 
 	hqDownload.DownloadComposite(context.Background(), "", con, "hd1080", "mp4")
 
-	//TODO
-	//ffmpeg -i video.mp4 -i audio.mp3 -c:v copy -c:a aac -strict experimental output.mp4
-
-	//add ffmpeg installer for 1 time use first get os then use command script for installing like winget install ffmpeg
-	// or use ffmpeg wrapper for who don't want to install ffmpeg
-
 	//videoInfo,err := client.GetVideoContext(context.Background(),videoID);
 	if err != nil {
 		panic(err)
@@ -117,8 +90,6 @@ func main() {
 	//1 360p
 	//2
 	//3
-	//4 144p 24kb/s
-	//5
 
 	formats := video.Formats.WithAudioChannels()
 	stream, _, err := client.GetStream(video, &formats[0])
