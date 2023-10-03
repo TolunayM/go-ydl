@@ -35,77 +35,82 @@ func ffmpeg(videoid string,soundId string){
 	}
 }*/
 
-func checkFFMPEG(){
-	os := runtime.GOOS;
-	if os == "windows"{
-		cmd := exec.Command("ffmpeg","-version");
-		_,err := cmd.Output();
-		if err != nil{
-			fmt.Print("FFMPEG must be installed first!");
-			getFFMPEG();
+func checkFFMPEG() {
+	os := runtime.GOOS
+	if os == "windows" {
+		cmd := exec.Command("ffmpeg", "-version")
+		_, err := cmd.Output()
+		if err != nil {
+			fmt.Print("FFMPEG must be installed first!")
+			getFFMPEG()
 		}
+		fmt.Println("FFMPEG is good to go")
 	}
 }
-func getFFMPEG(){
-	os := runtime.GOOS;
+func getFFMPEG() {
+	os := runtime.GOOS
 	if os == "windows" {
-		cmd := exec.Command("cmd","/C","winget install ffmpeg");
-		output,_ := cmd.Output();
-		cmd.Stdin = strings.NewReader("Y");
-		cmd.Run();
-		fmt.Print(string(output));
+		cmd := exec.Command("cmd", "/C", "winget install ffmpeg")
+		output, _ := cmd.Output()
+		cmd.Stdin = strings.NewReader("Y")
+		cmd.Run()
+		fmt.Print(string(output))
 	}
 	if os == "linux" {
-		fmt.Print("FFMPEG MUST BE INSTALLED");
+		fmt.Print("FFMPEG MUST BE INSTALLED")
 	}
 
-	if os == "darwin"{
-		fmt.Print("FFMPEG MUST BE INSTALLED");
+	if os == "darwin" {
+		fmt.Print("FFMPEG MUST BE INSTALLED")
 	}
 }
 
-func main(){
+func getVideoId(videoLink string) string {
+	videoID := strings.Split(videoLink, "=")[1]
+	return videoID
+}
 
-	checkFFMPEG();
-	videoID := "t6J-m7I056E";
-	client := youtube.Client{};
-	hqDownload := downloader.Downloader{};
+func main() {
 
+	checkFFMPEG()
+	fmt.Println("Video linki")
+	var videoLink string
+	fmt.Scanln(&videoLink)
 
-	video,err := client.GetVideo(videoID);
-	if err != nil{
-		panic(err);
+	videoID := getVideoId(videoLink)
+	client := youtube.Client{}
+	hqDownload := downloader.Downloader{}
+
+	video, err := client.GetVideo(videoID)
+	if err != nil {
+		panic(err)
 	}
-
 
 	//HQ DOWNLOAD
-	con,err := client.GetVideoContext(context.Background(),videoID);
-	if err != nil{
-		panic(err);
+	con, err := client.GetVideoContext(context.Background(), videoID)
+	if err != nil {
+		panic(err)
 	}
 
-	hqDownload.DownloadComposite(context.Background(),"" , con,"hd1080","mp4");
-
+	hqDownload.DownloadComposite(context.Background(), "", con, "hd1080", "mp4")
 
 	//TODO
 	//ffmpeg -i video.mp4 -i audio.mp3 -c:v copy -c:a aac -strict experimental output.mp4
 
 	//add ffmpeg installer for 1 time use first get os then use command script for installing like winget install ffmpeg
 	// or use ffmpeg wrapper for who don't want to install ffmpeg
-	
-
 
 	//videoInfo,err := client.GetVideoContext(context.Background(),videoID);
-	if err != nil{
-		panic(err);
+	if err != nil {
+		panic(err)
 	}
 
-	description,err := os.Create(videoID + ".txt");
-	if err != nil{
-		panic(err);
+	description, err := os.Create(videoID + ".txt")
+	if err != nil {
+		panic(err)
 	}
-	defer description.Close();
-	fmt.Fprintf(description,video.Description);
+	defer description.Close()
+	fmt.Fprintf(description, video.Description)
 	//fmt.Println(videoInfo);
 
 	//0 720p 128kb/s
@@ -115,26 +120,26 @@ func main(){
 	//4 144p 24kb/s
 	//5
 
-	formats := video.Formats.WithAudioChannels();
-	stream,_,err := client.GetStream(video,&formats[0]);
+	formats := video.Formats.WithAudioChannels()
+	stream, _, err := client.GetStream(video, &formats[0])
 
-	if err != nil{
-		panic(err);
+	if err != nil {
+		panic(err)
 	}
 
-	defer stream.Close();
+	defer stream.Close()
 
-	file2,err := os.Create("video.mp4");
+	file2, err := os.Create("video.mp4")
 
-	if err != nil{
-		panic(err);
+	if err != nil {
+		panic(err)
 	}
 
-	defer file2.Close();
+	defer file2.Close()
 
-	_,err = io.Copy(file2,stream);
-	if err != nil{
-		panic(err);
+	_, err = io.Copy(file2, stream)
+	if err != nil {
+		panic(err)
 	}
 
 }
