@@ -3,11 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-
 	"os/exec"
 	"runtime"
 	"strings"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -34,6 +32,7 @@ func checkFFMPEG() {
 
 //getting ffmpeg via winget
 func getFFMPEG() {
+
 	os := runtime.GOOS
 	if os == "windows" {
 		cmd := exec.Command("cmd", "/C", "winget install ffmpeg")
@@ -42,6 +41,7 @@ func getFFMPEG() {
 		cmd.Run()
 		fmt.Print(string(output))
 	}
+
 	if os == "linux" {
 		fmt.Print("FFMPEG MUST BE INSTALLED")
 	}
@@ -68,6 +68,7 @@ all youtube ids are has 11 characters in it and they coming right after
 
 */
 func getVideoId(videoLink string) string {
+
 	videoID := strings.Split(videoLink, "=")[1]
 
 	if len(videoID) > 11{
@@ -81,12 +82,14 @@ func getVideoId(videoLink string) string {
 //for clearing unused m4a and m4v files
 //they contains video and sound files seperately 
 func clearTemps(){
+
 	deleteNec := exec.Command("cmd","/C","del *.m4a *.m4v")
 	deleteNec.Run()
 }
 
 //downloading 1080p
 func downloadHQ(videoID string){
+
 	ctx := context.Background();
 	hqDownload := downloader.Downloader{};
 	client := youtube.Client{};
@@ -96,7 +99,6 @@ func downloadHQ(videoID string){
 		panic(err)
 	}
 	hqDownload.DownloadComposite(ctx,"",con,"hd1080","mp4");
-
 }
 
 func main() {
