@@ -17,6 +17,8 @@ import (
 )
 
 
+//FFMPEG must be installed on system and must be on PATH
+//this checks ffmpeg
 func checkFFMPEG() {
 	os := runtime.GOOS
 	if os == "windows" {
@@ -29,6 +31,8 @@ func checkFFMPEG() {
 		fmt.Println("FFMPEG is good to go")
 	}
 }
+
+//getting ffmpeg via winget
 func getFFMPEG() {
 	os := runtime.GOOS
 	if os == "windows" {
@@ -47,6 +51,22 @@ func getFFMPEG() {
 	}
 }
 
+/*
+
+	getting video id from youtube link
+for example
+
+https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley
+
+this video's id is dQw4w9WgXcQ
+
+all youtube ids are has 11 characters in it and they coming right after 
+
+				watchv?= 
+			
+			@Parameter
+
+*/
 func getVideoId(videoLink string) string {
 	videoID := strings.Split(videoLink, "=")[1]
 
@@ -57,11 +77,15 @@ func getVideoId(videoLink string) string {
 	return videoID
 }
 
+
+//for clearing unused m4a and m4v files
+//they contains video and sound files seperately 
 func clearTemps(){
 	deleteNec := exec.Command("cmd","/C","del *.m4a *.m4v")
 	deleteNec.Run()
 }
 
+//downloading 1080p
 func downloadHQ(videoID string){
 	ctx := context.Background();
 	hqDownload := downloader.Downloader{};
@@ -73,28 +97,23 @@ func downloadHQ(videoID string){
 	}
 	hqDownload.DownloadComposite(ctx,"",con,"hd1080","mp4");
 
-
-
 }
 
 func main() {
-
 	
 	checkFFMPEG()
 	clearTemps()
-	// fmt.Println("Video linki")
-	// var videoLink string
-	// fmt.Scanln(&videoLink)
 
 	myApp := app.New();
 	myWindow := myApp.NewWindow("go-ytdl");
 
+
 	//input
 	input := widget.NewEntry();
 	input.SetPlaceHolder("Paste Youtube Link Here");
-
 	input.Resize(fyne.NewSize(250,40))
 	input.Move(fyne.NewPos(75,60))
+
 
 	//download button
 	downButton := widget.NewButton("Download",func() {
@@ -111,13 +130,13 @@ func main() {
 	clearButton.Resize(fyne.NewSize(150,40));
 	clearButton.Move(fyne.NewPos(125,170))
 
+
 	//content
 	content := container.NewWithoutLayout(input,downButton,clearButton)
+	
 	//run app
 	myWindow.CenterOnScreen();
 	myWindow.Resize(fyne.NewSize(400, 250));
 	myWindow.SetContent(content);
 	myWindow.ShowAndRun();
-	
-	clearTemps();
 }
