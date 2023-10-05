@@ -18,6 +18,7 @@ import (
 //FFMPEG must be installed on system and must be on PATH
 //this checks ffmpeg
 func checkFFMPEG() {
+
 	os := runtime.GOOS
 	if os == "windows" {
 		cmd := exec.Command("ffmpeg", "-version")
@@ -125,7 +126,7 @@ func main() {
 	downButton.Move(fyne.NewPos(125,120))
 	
 
-	//clear temp files
+	//clear temp files like m4a and m4v
 	clearButton := widget.NewButton("Clear Temp Files",func() {
 		clearTemps();
 	})
