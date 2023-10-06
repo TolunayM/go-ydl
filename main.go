@@ -90,8 +90,9 @@ func clearTemps(){
 	deleteNec.Run()
 }
 
-func mp3Only(videoID string){
 
+//download only sound
+func mp3Only(videoID string){
 
 	client := youtube.Client{};
 	video,_ := client.GetVideo(videoID);
