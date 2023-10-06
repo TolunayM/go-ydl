@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
+	"os"
 	"os/exec"
 	"runtime"
 	"strings"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -13,7 +16,6 @@ import (
 	"github.com/kkdai/youtube/v2"
 	"github.com/kkdai/youtube/v2/downloader"
 )
-
 
 //FFMPEG must be installed on system and must be on PATH
 //this checks ffmpeg
@@ -87,6 +89,20 @@ func clearTemps(){
 	deleteNec.Run()
 }
 
+func mp3Only(videoID string){
+
+
+	client := youtube.Client{};
+	video,_ := client.GetVideo(videoID);
+	formats := video.Formats.WithAudioChannels();
+	stream,_,_ := client.GetStream(video, &formats[1]);
+	justSound,_ := os.Create("sound.mp3");
+	io.Copy(justSound, stream);
+	defer stream.Close();
+	defer justSound.Close();
+
+}
+
 //downloading 1080p
 func downloadHQ(videoID string){
 
@@ -123,6 +139,13 @@ func main() {
 	})
 	downButton.Resize(fyne.NewSize(150,40));
 	downButton.Move(fyne.NewPos(125,120))
+
+
+	justSoundButton := widget.NewButton("Just Sound",func() {
+		mp3Only(getVideoId(input.Text))
+	})
+	justSoundButton.Resize(fyne.NewSize(150,40));
+	justSoundButton.Move(fyne.NewPos(125,220))
 	
 
 	//clear temp files
@@ -134,11 +157,11 @@ func main() {
 
 
 	//content
-	content := container.NewWithoutLayout(input,downButton,clearButton)
+	content := container.NewWithoutLayout(input,downButton,clearButton,justSoundButton)
 	
 	//run app
 	myWindow.CenterOnScreen();
-	myWindow.Resize(fyne.NewSize(400, 250));
+	myWindow.Resize(fyne.NewSize(400, 300));
 	myWindow.SetContent(content);
 	myWindow.ShowAndRun();
 }
