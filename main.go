@@ -122,7 +122,6 @@ func downloadHQ(videoID string){
 func main() {
 	
 	checkFFMPEG()
-	clearTemps()
 
 	myApp := app.New();
 	myWindow := myApp.NewWindow("go-ytdl");
